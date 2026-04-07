@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
-import '../../../session/presentation/cubit/session_cubit.dart';
 import '../../../common/widgets/loading_widget.dart';
 import '../cubit/order_cubit.dart';
 
@@ -26,20 +25,17 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
     if (authState is AuthAuthenticated) {
       context.read<OrderCubit>().loadUserOrder(authState.user.id);
     }
-    context.read<SessionCubit>().loadCurrentSession();
   }
 
   void _repeatLastOrder() {
     final authState = context.read<AuthCubit>().state;
-    final sessionState = context.read<SessionCubit>().state;
     final orderState = context.read<OrderCubit>().state;
 
     if (authState is! AuthAuthenticated) return;
-    if (sessionState is! SessionLoaded || sessionState.session == null) return;
     if (orderState is! OrderLoaded || orderState.lastOrder == null) return;
 
     context.read<OrderCubit>().repeatLastOrder(
-      sessionId: sessionState.session!.id,
+      sessionId: '', // No longer using sessions
       userId: authState.user.id,
       userName: authState.user.name,
       lastOrder: orderState.lastOrder!,
@@ -107,53 +103,45 @@ class _MyOrderScreenState extends State<MyOrderScreen> {
   }
 
   Widget _buildNoOrder(dynamic lastOrder) {
-    return BlocBuilder<SessionCubit, SessionState>(
-      builder: (context, sessionState) {
-        final canOrder = sessionState is SessionLoaded &&
-            sessionState.session != null &&
-            sessionState.session!.canOrder;
-
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.receipt_long_outlined,
-                  size: 80,
-                  color: AppTheme.textSecondary.withValues(alpha: 0.5),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  context.l10n.noOrders,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: AppTheme.textSecondary,
-                  ),
-                ),
-                if (lastOrder != null && canOrder) ...[
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: _repeatLastOrder,
-                    icon: const Icon(Icons.replay),
-                    label: Text(context.l10n.repeatLastOrder),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${lastOrder.totalItems} ${context.l10n.items} • ${lastOrder.totalPrice.toStringAsFixed(2)} ${context.l10n.egp}',
-                    style: const TextStyle(
-                      color: AppTheme.textSecondary,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ],
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.receipt_long_outlined,
+              size: 80,
+              color: AppTheme.textSecondary.withValues(alpha: 0.5),
             ),
-          ),
-        );
-      },
+            const SizedBox(height: 24),
+            Text(
+              context.l10n.noOrders,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.textSecondary,
+              ),
+            ),
+            if (lastOrder != null) ...[
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: _repeatLastOrder,
+                icon: const Icon(Icons.replay),
+                label: Text(context.l10n.repeatLastOrder),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '${lastOrder.totalItems} ${context.l10n.items} • ${lastOrder.totalPrice.toStringAsFixed(2)} ${context.l10n.egp}',
+                style: const TextStyle(
+                  color: AppTheme.textSecondary,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 

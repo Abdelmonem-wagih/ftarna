@@ -11,8 +11,6 @@ import 'core/services/location_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
 import 'features/auth/presentation/pages/login_screen.dart';
-import 'features/session/presentation/cubit/session_cubit.dart';
-import 'features/menu/presentation/cubit/menu_cubit.dart';
 import 'features/order/presentation/cubit/order_cubit.dart';
 import 'features/admin/presentation/cubit/admin_cubit.dart';
 import 'features/restaurant/presentation/cubit/restaurant_cubit.dart';
@@ -47,8 +45,6 @@ class FtarnaApp extends StatelessWidget {
         providers: [
           BlocProvider(create: (_) => sl<LocaleCubit>()),
           BlocProvider(create: (_) => sl<AuthCubit>()),
-          BlocProvider(create: (_) => sl<SessionCubit>()),
-          BlocProvider(create: (_) => sl<MenuCubit>()),
           BlocProvider(create: (_) => sl<OrderCubit>()),
           BlocProvider(create: (_) => sl<AdminCubit>()),
           BlocProvider(create: (_) => sl<RestaurantCubit>()),
