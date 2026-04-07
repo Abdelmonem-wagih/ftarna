@@ -6,15 +6,10 @@ import 'package:get_it/get_it.dart';
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
-import '../../features/menu/data/repositories/menu_repository_impl.dart';
-import '../../features/menu/domain/repositories/menu_repository.dart';
-import '../../features/menu/presentation/cubit/menu_cubit.dart';
+
 import '../../features/order/data/repositories/order_repository_impl.dart';
 import '../../features/order/domain/repositories/order_repository.dart';
 import '../../features/order/presentation/cubit/order_cubit.dart';
-import '../../features/session/data/repositories/session_repository_impl.dart';
-import '../../features/session/domain/repositories/session_repository.dart';
-import '../../features/session/presentation/cubit/session_cubit.dart';
 import '../../features/admin/presentation/cubit/admin_cubit.dart';
 
 // New imports for multi-tenant system
@@ -58,12 +53,7 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(auth: sl(), firestore: sl()),
   );
-  sl.registerLazySingleton<SessionRepository>(
-    () => SessionRepositoryImpl(firestore: sl()),
-  );
-  sl.registerLazySingleton<MenuRepository>(
-    () => MenuRepositoryImpl(firestore: sl()),
-  );
+
   sl.registerLazySingleton<OrderRepository>(
     () => OrderRepositoryImpl(firestore: sl()),
   );
@@ -89,10 +79,8 @@ Future<void> initDependencies() async {
   sl.registerFactory(() => AuthCubit(sl()));
   sl.registerFactory(() => LocaleCubit());
   sl.registerFactory(() => PendingOrderCubit(sl()));
-  sl.registerFactory(() => SessionCubit(sl()));
-  sl.registerFactory(() => MenuCubit(sl()));
-  sl.registerFactory(() => OrderCubit(sl(), sl()));
-  sl.registerFactory(() => AdminCubit(sl(), sl()));
+  sl.registerFactory(() => OrderCubit(sl()));
+  sl.registerFactory(() => AdminCubit(sl()));
 
   // New Cubits
   sl.registerFactory(() => RestaurantCubit(sl(), sl()));

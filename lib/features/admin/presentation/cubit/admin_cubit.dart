@@ -4,8 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/constants.dart';
 import '../../../order/domain/entities/order_entity.dart';
 import '../../../order/domain/repositories/order_repository.dart';
-import '../../../session/domain/entities/session_entity.dart';
-import '../../../session/domain/repositories/session_repository.dart';
 
 // States
 abstract class AdminState extends Equatable {
@@ -20,29 +18,25 @@ class AdminInitial extends AdminState {}
 class AdminLoading extends AdminState {}
 
 class AdminLoaded extends AdminState {
-  final SessionEntity? session;
   final List<OrderEntity> orders;
   final Map<String, int> aggregatedItems;
   final double totalOrdersAmount;
 
   const AdminLoaded({
-    this.session,
     this.orders = const [],
     this.aggregatedItems = const {},
     this.totalOrdersAmount = 0,
   });
 
   @override
-  List<Object?> get props => [session, orders, aggregatedItems, totalOrdersAmount];
+  List<Object?> get props => [orders, aggregatedItems, totalOrdersAmount];
 
   AdminLoaded copyWith({
-    SessionEntity? session,
     List<OrderEntity>? orders,
     Map<String, int>? aggregatedItems,
     double? totalOrdersAmount,
   }) {
     return AdminLoaded(
-      session: session ?? this.session,
       orders: orders ?? this.orders,
       aggregatedItems: aggregatedItems ?? this.aggregatedItems,
       totalOrdersAmount: totalOrdersAmount ?? this.totalOrdersAmount,
@@ -76,40 +70,19 @@ class AdminError extends AdminState {
 
 // Cubit
 class AdminCubit extends Cubit<AdminState> {
-  final SessionRepository _sessionRepository;
   final OrderRepository _orderRepository;
 
-  StreamSubscription? _sessionSubscription;
   StreamSubscription? _ordersSubscription;
 
-  AdminCubit(
-    this._sessionRepository,
-    this._orderRepository,
-  ) : super(AdminInitial());
+  AdminCubit(this._orderRepository) : super(AdminInitial());
 
   void loadAdminData() {
     emit(AdminLoading());
 
-    _sessionSubscription?.cancel();
-    _sessionSubscription = _sessionRepository.currentSessionStream.listen(
-      (session) {
-        _loadOrdersForSession(session);
-      },
-      onError: (error) {
-        emit(AdminError(error.toString()));
-      },
-    );
-  }
-
-  void _loadOrdersForSession(SessionEntity? session) {
-    if (session == null) {
-      emit(const AdminLoaded());
-      return;
-    }
-
+    // Load all active orders (no session filtering needed)
     _ordersSubscription?.cancel();
     _ordersSubscription = _orderRepository
-        .getSessionOrdersStream(session.id)
+        .streamOrdersByBranch('') // TODO: Filter by branch when branch context is available
         .listen(
       (orders) {
         final aggregated = _calculateAggregation(orders);
@@ -118,7 +91,6 @@ class AdminCubit extends Cubit<AdminState> {
             .fold(0.0, (sum, o) => sum + o.totalPrice);
 
         emit(AdminLoaded(
-          session: session,
           orders: orders,
           aggregatedItems: aggregated,
           totalOrdersAmount: totalAmount,
@@ -143,54 +115,6 @@ class AdminCubit extends Cubit<AdminState> {
     return aggregated;
   }
 
-  Future<void> createSession() async {
-    try {
-      await _sessionRepository.createSession();
-    } catch (e) {
-      emit(AdminError(e.toString()));
-    }
-  }
-
-  Future<void> openSession(String sessionId) async {
-    try {
-      await _sessionRepository.openSession(sessionId);
-    } catch (e) {
-      emit(AdminError(e.toString()));
-    }
-  }
-
-  Future<void> closeSession(String sessionId) async {
-    try {
-      await _sessionRepository.closeSession(sessionId);
-    } catch (e) {
-      emit(AdminError(e.toString()));
-    }
-  }
-
-  Future<void> markDelivered(String sessionId) async {
-    try {
-      await _sessionRepository.markSessionDelivered(sessionId);
-    } catch (e) {
-      emit(AdminError(e.toString()));
-    }
-  }
-
-  Future<void> setDeliveryFee(String sessionId, double fee) async {
-    try {
-      await _sessionRepository.setDeliveryFee(sessionId, fee);
-    } catch (e) {
-      emit(AdminError(e.toString()));
-    }
-  }
-
-  Future<void> setTotalBill(String sessionId, double bill) async {
-    try {
-      await _sessionRepository.setTotalBill(sessionId, bill);
-    } catch (e) {
-      emit(AdminError(e.toString()));
-    }
-  }
-
   Future<void> markOrderPaid(String orderId) async {
     try {
       await _orderRepository.markOrderPaid(orderId);
@@ -207,17 +131,19 @@ class AdminCubit extends Cubit<AdminState> {
     }
   }
 
-  SessionEntity? get currentSession {
-    final state = this.state;
-    if (state is AdminLoaded) {
-      return state.session;
+  Future<void> updateOrderStatus(String orderId, OrderStatus status) async {
+    try {
+      final order = await _orderRepository.getOrderById(orderId);
+      if (order != null) {
+        await _orderRepository.updateOrder(order.copyWith(status: status));
+      }
+    } catch (e) {
+      emit(AdminError(e.toString()));
     }
-    return null;
   }
 
   @override
   Future<void> close() {
-    _sessionSubscription?.cancel();
     _ordersSubscription?.cancel();
     return super.close();
   }

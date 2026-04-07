@@ -1,7 +1,5 @@
 class FirestoreCollections {
   static const String users = 'users';
-  static const String sessions = 'sessions';
-  static const String menuItems = 'menu_items';
   static const String orders = 'orders';
 
   // Multi-tenant collections

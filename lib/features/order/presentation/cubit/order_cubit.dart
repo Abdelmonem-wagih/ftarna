@@ -2,10 +2,8 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
-import '../../../menu/domain/entities/menu_item_entity.dart';
 import '../../domain/entities/order_entity.dart';
 import '../../domain/repositories/order_repository.dart';
-import '../../../session/domain/repositories/session_repository.dart';
 
 // States
 abstract class OrderState extends Equatable {
@@ -55,30 +53,26 @@ class OrderError extends OrderState {
 // Cubit
 class OrderCubit extends Cubit<OrderState> {
   final OrderRepository _orderRepository;
-  final SessionRepository _sessionRepository;
   StreamSubscription? _orderSubscription;
 
-  OrderCubit(this._orderRepository, this._sessionRepository)
+  OrderCubit(this._orderRepository)
       : super(OrderInitial());
 
   void loadUserOrder(String userId) async {
     emit(OrderLoading());
 
     try {
-      final session = await _sessionRepository.getCurrentSession();
-      if (session == null) {
-        emit(const OrderLoaded());
-        return;
-      }
-
       final lastOrder = await _orderRepository.getLastUserOrder(userId);
 
+      // Load user's active orders
       _orderSubscription?.cancel();
       _orderSubscription = _orderRepository
-          .getUserOrderStream(session.id, userId)
+          .streamUserActiveOrders(userId)
           .listen(
-        (order) {
-          emit(OrderLoaded(currentOrder: order, lastOrder: lastOrder));
+        (orders) {
+          // Get the first pending order if any
+          final currentOrder = orders.isNotEmpty ? orders.first : null;
+          emit(OrderLoaded(currentOrder: currentOrder, lastOrder: lastOrder));
         },
         onError: (error) {
           emit(OrderError(error.toString()));
@@ -93,7 +87,6 @@ class OrderCubit extends Cubit<OrderState> {
     required String sessionId,
     required String userId,
     required String userName,
-    required List<MenuItemEntity> menuItems,
     required Map<String, int> selectedQuantities,
   }) async {
     if (selectedQuantities.isEmpty) {
@@ -104,15 +97,8 @@ class OrderCubit extends Cubit<OrderState> {
     emit(OrderSubmitting());
 
     try {
-      // Check if session is still open
-      final session = await _sessionRepository.getCurrentSession();
-      if (session == null || !session.canOrder) {
-        emit(const OrderError('Session is closed'));
-        return;
-      }
-
-      // Check if user already has an order
-      final existingOrder = await _orderRepository.getUserOrder(sessionId, userId);
+      // Check if user already has a pending order
+      final existingOrder = await _orderRepository.getUserPendingOrder(userId);
       if (existingOrder != null && !existingOrder.isCancelled) {
         emit(const OrderError('You already have an order'));
         return;
@@ -122,23 +108,9 @@ class OrderCubit extends Cubit<OrderState> {
       final orderItems = <OrderItemEntity>[];
       double totalPrice = 0;
 
-      for (final entry in selectedQuantities.entries) {
-        final menuItem = menuItems.firstWhere(
-          (item) => item.id == entry.key,
-          orElse: () => throw Exception('Menu item not found'),
-        );
 
-        orderItems.add(OrderItemEntity(
-          id: '${menuItem.id}_${DateTime.now().millisecondsSinceEpoch}',
-          productId: menuItem.id,
-          nameAr: menuItem.name,
-          nameEn: menuItem.name,
-          basePrice: menuItem.price,
-          quantity: entry.value,
-        ));
 
-        totalPrice += menuItem.price * entry.value;
-      }
+
 
       final order = OrderEntity(
         id: const Uuid().v4(),
@@ -179,15 +151,8 @@ class OrderCubit extends Cubit<OrderState> {
     emit(OrderSubmitting());
 
     try {
-      // Check if session is still open
-      final session = await _sessionRepository.getCurrentSession();
-      if (session == null || !session.canOrder) {
-        emit(const OrderError('Session is closed'));
-        return;
-      }
-
-      // Check if user already has an order
-      final existingOrder = await _orderRepository.getUserOrder(sessionId, userId);
+      // Check if user already has a pending order
+      final existingOrder = await _orderRepository.getUserPendingOrder(userId);
       if (existingOrder != null && !existingOrder.isCancelled) {
         emit(const OrderError('You already have an order'));
         return;
