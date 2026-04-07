@@ -1,0 +1,150 @@
+{
+  "@@locale": "ar",
+  "appTitle": "فطارنا",
+  "login": "تسجيل الدخول",
+  "logout": "تسجيل الخروج",
+  "email": "البريد الإلكتروني",
+  "password": "كلمة المرور",
+  "phone": "رقم الهاتف",
+  "loginWithEmail": "تسجيل الدخول بالبريد",
+  "loginWithPhone": "تسجيل الدخول بالهاتف",
+  "register": "إنشاء حساب",
+  "forgotPassword": "نسيت كلمة المرور؟",
+  "enterEmail": "أدخل بريدك الإلكتروني",
+  "enterPassword": "أدخل كلمة المرور",
+  "enterPhone": "أدخل رقم هاتفك",
+  "invalidEmail": "بريد إلكتروني غير صالح",
+  "invalidPassword": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+  "loginSuccess": "تم تسجيل الدخول بنجاح",
+  "loginFailed": "فشل تسجيل الدخول",
+  "registerSuccess": "تم إنشاء الحساب بنجاح",
+  "registerFailed": "فشل إنشاء الحساب",
+
+  "menu": "القائمة",
+  "myOrder": "طلبي",
+  "admin": "لوحة التحكم",
+  "settings": "الإعدادات",
+  "language": "اللغة",
+  "arabic": "العربية",
+  "english": "الإنجليزية",
+
+  "breakfast": "الفطار",
+  "sessionOpen": "الجلسة مفتوحة",
+  "sessionClosed": "الجلسة مغلقة",
+  "sessionDelivered": "تم التوصيل",
+  "openSession": "فتح الجلسة",
+  "closeSession": "إغلاق الجلسة",
+  "markDelivered": "تحديد كمُوصَّل",
+  "deliveryFee": "رسوم التوصيل",
+  "totalBill": "إجمالي الفاتورة",
+  "enterDeliveryFee": "أدخل رسوم التوصيل",
+  "enterTotalBill": "أدخل إجمالي الفاتورة",
+
+  "addItem": "إضافة صنف",
+  "editItem": "تعديل صنف",
+  "archiveItem": "أرشفة صنف",
+  "itemName": "اسم الصنف",
+  "itemPrice": "السعر",
+  "itemActive": "نشط",
+  "itemArchived": "مؤرشف",
+  "saveItem": "حفظ الصنف",
+  "menuManagement": "إدارة القائمة",
+
+  "placeOrder": "اطلب الآن",
+  "submitOrder": "إرسال الطلب",
+  "orderSubmitted": "تم إرسال الطلب بنجاح!",
+  "orderFailed": "فشل إرسال الطلب",
+  "noItemsSelected": "يرجى اختيار صنف واحد على الأقل",
+  "repeatLastOrder": "تكرار الطلب السابق",
+  "noLastOrder": "لا يوجد طلب سابق",
+  "orderHistory": "سجل الطلبات",
+  "quantity": "الكمية",
+  "total": "الإجمالي",
+  "subtotal": "المجموع الفرعي",
+  "yourShare": "حصتك",
+
+  "orders": "الطلبات",
+  "allOrders": "كل الطلبات",
+  "aggregatedItems": "ملخص الأصناف",
+  "orderDetails": "تفاصيل الطلب",
+  "markAsPaid": "تحديد كمدفوع",
+  "cancelOrder": "إلغاء الطلب",
+  "paid": "مدفوع",
+  "notPaid": "غير مدفوع",
+  "cancelled": "ملغي",
+  "confirmCancel": "هل أنت متأكد من إلغاء هذا الطلب؟",
+  "confirmPaid": "تحديد هذا الطلب كمدفوع؟",
+  "yes": "نعم",
+  "no": "لا",
+  "cancel": "إلغاء",
+  "confirm": "تأكيد",
+  "save": "حفظ",
+  "delete": "حذف",
+  "edit": "تعديل",
+  "add": "إضافة",
+  "remove": "إزالة",
+
+  "egp": "جنيه",
+  "currency": "{amount} جنيه",
+  "@currency": {
+    "placeholders": {
+      "amount": {
+        "type": "double",
+        "format": "decimalPattern"
+      }
+    }
+  },
+
+  "noOrders": "لا توجد طلبات بعد",
+  "noMenuItems": "لا توجد أصناف متاحة",
+  "loading": "جاري التحميل...",
+  "error": "حدث خطأ ما",
+  "tryAgain": "حاول مرة أخرى",
+  "success": "تم بنجاح",
+  "orderAlreadySubmitted": "لقد أرسلت طلبك بالفعل",
+  "sessionClosedCannotOrder": "الجلسة مغلقة، لا يمكنك الطلب الآن",
+
+  "notificationSessionOpened": "الفطار متاح الآن، اطلب الآن!",
+  "notificationSessionClosed": "تم إغلاق الطلبات الآن",
+  "notificationPaymentDue": "عليك دفع {amount} جنيه",
+  "@notificationPaymentDue": {
+    "placeholders": {
+      "amount": {
+        "type": "double",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "notificationReminder": "لم تطلب بعد",
+  "notificationOrderCancelled": "تم إلغاء طلبك",
+
+  "users": "المستخدمين",
+  "user": "مستخدم",
+  "items": "الأصناف",
+  "item": "صنف",
+  "price": "السعر",
+  "qty": "الكمية",
+  "totalItems": "الإجمالي: {count} صنف",
+  "@totalItems": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "welcome": "مرحباً",
+  "welcomeBack": "مرحباً بعودتك!",
+  "goodMorning": "صباح الخير",
+  "orderNow": "اطلب الآن",
+  "viewMenu": "عرض القائمة",
+  "emptyCart": "السلة فارغة",
+  "addToOrder": "أضف للطلب",
+
+  "searchMenu": "ابحث في القائمة...",
+  "filter": "تصفية",
+  "sortBy": "ترتيب حسب",
+  "name": "الاسم",
+  "priceAsc": "السعر: من الأقل للأعلى",
+  "priceDesc": "السعر: من الأعلى للأقل"
+}
